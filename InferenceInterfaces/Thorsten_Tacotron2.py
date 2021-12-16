@@ -8,7 +8,7 @@ import torch
 
 from InferenceInterfaces.InferenceArchitectures.InferenceHiFiGAN import HiFiGANGenerator
 from InferenceInterfaces.InferenceArchitectures.InferenceTacotron2 import Tacotron2
-from Preprocessing.TextFrontend import TextFrontend
+from Preprocessing.TextFrontend_original_3B_and_4B import TextFrontend
 
 
 class Thorsten_Tacotron2(torch.nn.Module):
@@ -20,7 +20,7 @@ class Thorsten_Tacotron2(torch.nn.Module):
         self.text2phone = TextFrontend(language="de", use_word_boundaries=False, use_explicit_eos=False, inference=True)
         self.phone2mel = Tacotron2(path_to_weights=os.path.join("Models", "Tacotron2_Thorsten", "best.pt"),
                                    idim=166, odim=80, spk_embed_dim=None, reduction_factor=1).to(torch.device(device))
-        self.mel2wav = HiFiGANGenerator(path_to_weights=os.path.join("Models", "HiFiGAN_combined", "best.pt")).to(torch.device(device))
+        self.mel2wav = HiFiGANGenerator(path_to_weights=os.path.join("Models", "HiFiGAN_aridialect", "best.pt")).to(torch.device(device))
         self.phone2mel.eval()
         self.mel2wav.eval()
         self.to(torch.device(device))
