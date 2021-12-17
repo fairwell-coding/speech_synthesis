@@ -2,7 +2,7 @@ import os
 
 def build_path_to_transcript_dict_aridialect():
     path_to_transcript = dict()
-    with open("/IMS-Toucan/aridialect/test-text.txt", encoding="utf8") as f:
+    with open("/IMS-Toucan/aridialect/train-text.txt", encoding="utf8") as f:
         transcriptions = f.read()
     trans_lines = transcriptions.split("\n")
     for line in trans_lines:
