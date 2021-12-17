@@ -15,6 +15,8 @@ from InferenceInterfaces.aridialect_Tacotron2 import aridialect_Tacotron2
 
 from InferenceInterfaces.neural_vecoder import neural_vecoder
 from InferenceInterfaces.text_to_mel import aridialect_text2mel
+from Preprocessing.AudioPreprocessor import AudioPreprocessor
+import librosa
 
 tts_dict = {
     "fast_thorsten": Thorsten_FastSpeech2,
@@ -76,23 +78,37 @@ def read_neural_vecoder(device):
     path = ""
     with open(os.path.join(path, "data/test-text.txt"), "r", encoding="utf8") as f:
         sents = f.read().split("\n")
-    #output_dir = "/aridialect/audios/test_neural_vocoder"
+
     output_dir = "audios/test_neural_vocoder/"
+    sample_rate = 16e3
 
     if not os.path.isdir(output_dir):
         os.makedirs(output_dir)
     for index, sent in enumerate(sents):
         print(sent)
         sentid = sent.split("|")[0]
+
         wavname = os.path.join(path, "data/aridialect_wav16000", sentid + ".wav")
+        wave ,s = librosa.load(wavname,sr=sample_rate)
 
-        T2M = aridialect_text2mel(device=device,  speaker_embedding="default_speaker_embedding.pt")
-        mel_spectras = T2M.read_to_mel(wav_list=[wavname])
-
+        ####
+        # previous - Melspectra via Tacotron2 Interface
         # mel spectras coming from Tacotron2 from the original WAV files
         # however mel spectras could also be computed via other methods
         # in order to minimize errors coming from other sources than the HiFiGAN
         # since this procedure is obted to verifiy the HiFiGAN neural vocoder
+        #T2M = aridialect_text2mel(device=device,  speaker_embedding="default_speaker_embedding.pt")
+        # mel_spectras = T2M.read_to_mel(wav_list=[wavname])
+        ####
+
+
+        # Generate clean Melspectra from original audio files
+        mel_spectras = []
+        audioprocessor = AudioPreprocessor(sample_rate)
+
+        wave_noramlized = audioprocessor.normalize_audio(wave)
+        mel_spectra = audioprocessor.logmelfilterbank(wave_noramlized,sample_rate)
+        mel_spectras.append(mel_spectra) # save as a list since neural vocoder iterates over list
 
         NV = neural_vecoder(device=device, speaker_embedding="default_speaker_embedding.pt")
         NV.mel_to_file(mel_spectras, file_location=output_dir + "/{}.wav".format(sentid))
@@ -127,5 +143,5 @@ if __name__ == '__main__':
 
     #read_aridialect_sentences(model_id="taco_aridialect", device=exec_device)
 
-    #read_neural_vecoder(device=exec_device)
-    read_aridialect_sentences_thorsten(model_id='taco_thorsten', device='cpu')
+    read_neural_vecoder(device=exec_device)
+    #read_aridialect_sentences_thorsten(model_id='taco_thorsten', device='cpu')

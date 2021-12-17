@@ -30,11 +30,9 @@ class aridialect_text2mel(torch.nn.Module):
         #self.phone2mel = Tacotron2(path_to_weights=os.path.join("Models", "Tacotron2_aridialect", "best.pt"),
         #                           idim=166, odim=80, spk_embed_dim=960, reduction_factor=1).to(torch.device(device))
 
-        #self.phone2mel = Tacotron2(path_to_weights=os.path.join("Models", "Tacotron2_aridialect", "best.pt"),
-        #                          idim=166, odim=80, spk_embed_dim=None, reduction_factor=1).to(torch.device(device))
+        self.phone2mel = Tacotron2(path_to_weights=os.path.join("Models", "Tacotron2_aridialect", "best.pt"),
+                                  idim=166, odim=80, spk_embed_dim=None, reduction_factor=1).to(torch.device(device))
 
-        self.phone2mel = Tacotron2(path_to_weights=os.path.join("Models", "Tacotron2_aridialect", "checkpoint_29492.pt"),
-                                   idim=166, odim=80, spk_embed_dim=None, reduction_factor=1).to(torch.device(device))
 
         self.phone2mel.eval()
         self.to(torch.device(device))
